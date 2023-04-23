@@ -82,7 +82,9 @@ Jacobi: Run time for different N and number of threads used (in seconds):
 
 **Problem 4**
 
-For the final project, we will be working in a group of three people: Jimmy Zhu, Huilin Li, and Kitty Li. We are planning to use the Lattice Boltzmann Method(LBM) to model a 2D flow in a rectangular channel, which is a method that instead of solving the Navier-Stokes equations directly, it models fluid particles moving from one discrete grid point to another according to collision rules. The numerical steps for simulating fluid are the collision step and the streaming step:
+(Credit to Kitty Li for writing this part for our group)
+
+For the final project, we will be working in a group of three people: Yifei Zhu, Huilin Li, and Kitty Li. We are planning to **use the Lattice Boltzmann Method(LBM) to model a 2D flow in a rectangular channel**, which is a method that instead of solving the Navier-Stokes equations directly, it models fluid particles moving from one discrete grid point to another according to collision rules. The numerical steps for simulating fluid are the collision step and the streaming step:
 
 The collision step:
 
