@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <iostream>
 #include <math.h>
-#include <omp.h>
+#include <mpi.h>
 #include <cassert>  
 
 
@@ -55,39 +55,47 @@ void scan_omp(long* prefix_sum, const long* A, long n) {
     free(correction);
 }
 
-int main() {
-  long N = 100000000;
-  long* A = (long*) malloc(N * sizeof(long));
-  long* B0 = (long*) malloc(N * sizeof(long));
-  long* B1 = (long*) malloc(N * sizeof(long));
-  for (long i = 0; i < N; i++) A[i] = rand();
-  for (long i = 0; i < N; i++) B0[i] = 0;
-  for (long i = 0; i < N; i++) B1[i] = 0;
-  
-  double tt = omp_get_wtime();
-  scan_seq(B0, A, N);
-  printf("sequential-scan = %fs\n", omp_get_wtime() - tt);
+int main(int argc, char* argv[]) {
+    MPI_Init(&argc, &argv);
+    long N = 100000000;
+    int rank, size;
+    MPI_Comm comm = MPI_COMM_WORLD;
+    MPI_Comm_rank(comm, &rank);
+    MPI_Comm_size(comm, &size);
 
-  tt = omp_get_wtime();
-  scan_omp(B1, A, N);
-  printf("parallel-scan   = %fs\n", omp_get_wtime() - tt);
+    long* B1 = (long*) malloc(N * sizeof(long));
+    if (rank == 0){
+        long* A = (long*) malloc(N * sizeof(long));
+        long* B0 = (long*) malloc(N * sizeof(long));
+        for (long i = 0; i < N; i++) A[i] = rand();
+        for (long i = 0; i < N; i++) B0[i] = 0;
+        for (long i = 0; i < N; i++) B1[i] = 0;
+        
+        double tt = MPI_Wtime(); ;
+        scan_seq(B0, A, N);
+        printf("sequential-scan = %fs\n", MPI_Wtime();  - tt);
+    }
 
-  long err = 0;
-  for (long i = 0; i < N; i++) {
-      err = std::max(err, std::abs(B0[i] - B1[i]));
-      // if (err != 0) {
-      //   std::cout << "B0[" << i << "] = " << B0[i] << std::endl;
-      //   std::cout << "B1[" << i << "] = " << B1[i] << std::endl;
-      //   std::cout << "B0[" << i <<"] - B1[" << i << "] = " << B0[i] - B1[i] << std::endl;
-      //   std::cout << "i = " << i << ", err = " << err << "\n";
-      //   break;
-      // }
-      // assert (err == 0);
-  }
-  printf("error = %ld\n", err);
+    tt = MPI_Wtime();
+    scan_omp(B1, A, N);
+    printf("parallel-scan   = %fs\n", MPI_Wtime() - tt);
 
-  free(A);
-  free(B0);
-  free(B1);
-  return 0;
+    long err = 0;
+    for (long i = 0; i < N; i++) {
+        err = std::max(err, std::abs(B0[i] - B1[i]));
+        // if (err != 0) {
+        //   std::cout << "B0[" << i << "] = " << B0[i] << std::endl;
+        //   std::cout << "B1[" << i << "] = " << B1[i] << std::endl;
+        //   std::cout << "B0[" << i <<"] - B1[" << i << "] = " << B0[i] - B1[i] << std::endl;
+        //   std::cout << "i = " << i << ", err = " << err << "\n";
+        //   break;
+        // }
+        // assert (err == 0);
+    }
+    printf("error = %ld\n", err);
+
+    free(A);
+    free(B0);
+    free(B1);
+    return 0;
 }
