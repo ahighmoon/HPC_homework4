@@ -38,7 +38,7 @@ void scan_mpi(long* prefix_sum, const long* A, long* cor, int rank, int size, lo
 
 int main(int argc, char* argv[]) {
     MPI_Init(&argc, &argv);
-    long N = 100000;
+    long N = 10000000;
     long p = 4; // number of processes is fixed here
     int rank, size;
     MPI_Comm comm = MPI_COMM_WORLD;
@@ -66,7 +66,7 @@ int main(int argc, char* argv[]) {
         scan_seq(B0, A, N);
         printf("sequential-scan = %fs\n", MPI_Wtime() - tt);
     }
-    MPI_Barrier(comm);
+    //MPI_Barrier(comm);
     tt = MPI_Wtime();
     MPI_Scatter(A, chunksize, MPI_LONG, recv, chunksize, MPI_LONG, 0, comm);
     //printf("rank = %d, recv = %ld %ld\n", rank, recv[0], recv[1]);
