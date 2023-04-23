@@ -15,8 +15,11 @@ void scan_seq(long* prefix_sum, const long* A, long n) {
     }
 }
 
-void scan_mpi(long* prefix_sum, const long* A, long* cor, int rank, int size, long n) {
+void scan_mpi(long* prefix_sum, const long* A, long* cor, int rank, int size, long n, long* B2) {
     // prefix_sum = B1, A = recv, n = chunksize
+    // 1 2 3  4  5  6  7  8
+    // 1 3 6 10 15 21 28 36
+    // 1 3 // 3 7 // 5 11 // 7 15
 
     prefix_sum[0] = A[0]; // I change this code to include the 1st entry of A
     for (int j = 1; j < n; j++){ // only modify the first chunksize entries of prefix_sum
@@ -46,14 +49,14 @@ void scan_mpi(long* prefix_sum, const long* A, long* cor, int rank, int size, lo
     // **************************************************************
 
     cor[rank] = prefix_sum[n-1];
-    printf("rank = %d, data = %d %d %d %d\n", rank, cor[0], cor[1], cor[2], cor[3]); 
+    //printf("rank = %d, data = %d %d %d %d\n", rank, cor[0], cor[1], cor[2], cor[3]); 
     MPI_Barrier(MPI_COMM_WORLD);
     for (int i = 0; i < size; i++){
       MPI_Barrier(MPI_COMM_WORLD);
       MPI_Bcast(&cor[i], 1, MPI_INT, i, MPI_COMM_WORLD);
       MPI_Barrier(MPI_COMM_WORLD);
     }
-    printf("rank = %d, data = %d %d %d %d\n", rank, cor[0], cor[1], cor[2], cor[3]); 
+    //printf("rank = %d, data = %d %d %d %d\n", rank, cor[0], cor[1], cor[2], cor[3]); 
     
     //correction[0] = 0;
     //for (int i = 1; i < p; i++) {
@@ -72,15 +75,20 @@ void scan_mpi(long* prefix_sum, const long* A, long* cor, int rank, int size, lo
     //}
     long prev = 0;
     for (int i = 0; i < rank; i++) prev += cor[i];
+    //printf("rank = %d, prev = %ld, prefix_sum = %ld %ld\n", rank, prev, prefix_sum[0], prefix_sum[1]);
     for (int i = 0; i < n; i++) prefix_sum[i] += prev;
     free(cor);
     //if (rank == 0)
-    printf("rank = %d, prefix_sum = %ld %ld %ld %ld %ld %ld %ld %ld\n", rank, prefix_sum[0], prefix_sum[1], prefix_sum[2], prefix_sum[3], prefix_sum[4], prefix_sum[5], prefix_sum[6], prefix_sum[7]);
+    //printf("rank = %d, prefix_sum = %ld %ld\n", rank, prefix_sum[0], prefix_sum[1]);
+    MPI_Barrier(MPI_COMM_WORLD);
+    MPI_Gather(prefix_sum, n, MPI_LONG, B2, n, MPI_LONG, 0, MPI_COMM_WORLD);
+    MPI_Barrier(MPI_COMM_WORLD);
+    //if (rank == 0) printf("B2 = %ld %ld %ld %ld %ld %ld %ld %ld\n", B2[0], B2[1], B2[2], B2[3], B2[4], B2[5], B2[6], B2[7]);
 }
 
 int main(int argc, char* argv[]) {
     MPI_Init(&argc, &argv);
-    long N = 8;
+    long N = 20;
     long p = 4;
     int rank, size;
     MPI_Comm comm = MPI_COMM_WORLD;
@@ -90,7 +98,9 @@ int main(int argc, char* argv[]) {
     long chunksize = ceil(N / double(p));
     
     long* A = (long*) malloc(N * sizeof(long));
-    long* B1 = (long*) malloc(N * sizeof(long));
+    long* B0 = (long*) malloc(N * sizeof(long));
+    long* B1 = (long*) malloc(chunksize * sizeof(long));
+    long* B2 = (long*) malloc(N * sizeof(long));
     long* recv = (long*) malloc(chunksize * sizeof(long));
     long* correction = (long*) malloc(p * sizeof(long));
     for (long i = 0; i < chunksize; i++) B1[i] = 0;
@@ -99,29 +109,28 @@ int main(int argc, char* argv[]) {
 
     double tt;
     if (rank == 0){
-        long* B0 = (long*) malloc(N * sizeof(long));
-        for (long i = 0; i < N; i++) A[i] = i; // rand();
+    	//long* B0 = (long*) malloc(N * sizeof(long));
+        for (long i = 0; i < N; i++) A[i] = i+1; // rand();
         for (long i = 0; i < N; i++) B0[i] = 0;
         
         tt = MPI_Wtime(); ;
         scan_seq(B0, A, N);
         printf("sequential-scan = %fs\n", MPI_Wtime() - tt);
-        free(B0);
-        tt = MPI_Wtime();
+        //free(B0);
     }
-    printf("rank = %d, B1[1] = %ld\n", rank, B1[1]);
+    //printf("rank = %d, recv[0] = %ld\n", rank, recv[0]);
+    MPI_Barrier(comm);
+    tt = MPI_Wtime();
     MPI_Scatter(A, chunksize, MPI_LONG, recv, chunksize, MPI_LONG, 0, comm);
-    printf("rank = %d, B1[1] = %ld\n", rank, B1[1]);
+    //printf("rank = %d, recv = %ld %ld\n", rank, recv[0], recv[1]);
 
-    scan_mpi(B1, recv, correction, rank, size, chunksize);
-    //printf("parallel-scan   = %fs\n", MPI_Wtime() - tt);
-
-
-    //long err = 0;
-    //for (long i = 0; i < N; i++) {
-        //err = std::max(err, std::abs(B0[i] - B1[i]));
-
-        // if (err != 0) {
+    scan_mpi(B1, recv, correction, rank, size, chunksize, B2);
+    if (rank == 0) {
+	printf("parallel-scan = %fs\n", MPI_Wtime() - tt);
+        long err = 0;
+        for (long i = 0; i < N; i++) {
+            err = std::max(err, std::abs(B0[i] - B2[i]));
+        //if (err != 0) {
         //   std::cout << "B0[" << i << "] = " << B0[i] << std::endl;
         //   std::cout << "B1[" << i << "] = " << B1[i] << std::endl;
         //   std::cout << "B0[" << i <<"] - B1[" << i << "] = " << B0[i] - B1[i] << std::endl;
@@ -129,13 +138,14 @@ int main(int argc, char* argv[]) {
         //   break;
         // }
         // assert (err == 0);
-    //}
-    //printf("error = %ld\n", err);
-
+        }
+        printf("error = %ld\n", err);
+    }
     free(A);
+    //free(B0);
     free(B1);
+    free(recv);
+    free(B2);
     MPI_Finalize();
     return 0;
-
-
 }
