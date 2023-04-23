@@ -49,14 +49,14 @@ void scan_mpi(long* prefix_sum, const long* A, long* cor, int rank, int size, lo
     // **************************************************************
 
     cor[rank] = prefix_sum[n-1];
-    //printf("rank = %d, data = %d %d %d %d\n", rank, cor[0], cor[1], cor[2], cor[3]); 
+    //printf("rank = %d, data = %ld %ld %ld %ld\n", rank, cor[0], cor[1], cor[2], cor[3]); 
     MPI_Barrier(MPI_COMM_WORLD);
     for (int i = 0; i < size; i++){
       MPI_Barrier(MPI_COMM_WORLD);
-      MPI_Bcast(&cor[i], 1, MPI_INT, i, MPI_COMM_WORLD);
+      MPI_Bcast(&cor[i], 1, MPI_LONG, i, MPI_COMM_WORLD);
       MPI_Barrier(MPI_COMM_WORLD);
     }
-    //printf("rank = %d, data = %d %d %d %d\n", rank, cor[0], cor[1], cor[2], cor[3]); 
+    //printf("rank = %d, data = %ld %ld %ld %ld\n", rank, cor[0], cor[1], cor[2], cor[3]); 
     
     //correction[0] = 0;
     //for (int i = 1; i < p; i++) {
@@ -88,7 +88,7 @@ void scan_mpi(long* prefix_sum, const long* A, long* cor, int rank, int size, lo
 
 int main(int argc, char* argv[]) {
     MPI_Init(&argc, &argv);
-    long N = 20;
+    long N = 100000000;
     long p = 4;
     int rank, size;
     MPI_Comm comm = MPI_COMM_WORLD;
@@ -104,14 +104,16 @@ int main(int argc, char* argv[]) {
     long* recv = (long*) malloc(chunksize * sizeof(long));
     long* correction = (long*) malloc(p * sizeof(long));
     for (long i = 0; i < chunksize; i++) B1[i] = 0;
+    for (long i = 0; i < N; i++) B2[i] = 0;
     for (long i = 0; i < chunksize; i++) recv[i] = 0;
     for (long i = 0; i < p; i ++) correction[i] = 0;
 
-    double tt = MPI_Wtime();
+    double tt;
     if (rank == 0){
         for (long i = 0; i < N; i++) A[i] = rand(); // i+1;
         for (long i = 0; i < N; i++) B0[i] = 0;
-        //tt = MPI_Wtime();
+        tt = MPI_Wtime();
+        //for (long i = 0; i < 10; i++) printf("A[%ld] = %ld\n", i, A[i]);
         scan_seq(B0, A, N);
         printf("sequential-scan = %fs\n", MPI_Wtime() - tt);
     }
@@ -124,8 +126,8 @@ int main(int argc, char* argv[]) {
     scan_mpi(B1, recv, correction, rank, size, chunksize, B2);
     if (rank == 0) {
 	printf("parallel-scan = %fs\n", MPI_Wtime() - tt);
-        for (int i = 0; i < N; i++) printf("B0[%d] = %ld, B2[%d] = %ld\n", i, B0[i], i, B2[i]);
-	long err = 0;
+        //for (long i = 0; i < 10; i++) printf("B0[%ld] = %ld, B2[%ld] = %ld\n", i, B0[i], i, B2[i]);
+	    long err = 0;
         for (long i = 0; i < N; i++) err = std::max(err, std::abs(B0[i] - B2[i]));
         printf("error = %ld\n", err);
     }
