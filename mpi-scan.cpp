@@ -107,16 +107,13 @@ int main(int argc, char* argv[]) {
     for (long i = 0; i < chunksize; i++) recv[i] = 0;
     for (long i = 0; i < p; i ++) correction[i] = 0;
 
-    double tt;
+    double tt = MPI_Wtime();
     if (rank == 0){
-    	//long* B0 = (long*) malloc(N * sizeof(long));
-        for (long i = 0; i < N; i++) A[i] = i+1; // rand();
+        for (long i = 0; i < N; i++) A[i] = rand(); // i+1;
         for (long i = 0; i < N; i++) B0[i] = 0;
-        
-        tt = MPI_Wtime(); ;
+        //tt = MPI_Wtime();
         scan_seq(B0, A, N);
         printf("sequential-scan = %fs\n", MPI_Wtime() - tt);
-        //free(B0);
     }
     //printf("rank = %d, recv[0] = %ld\n", rank, recv[0]);
     MPI_Barrier(comm);
@@ -127,18 +124,9 @@ int main(int argc, char* argv[]) {
     scan_mpi(B1, recv, correction, rank, size, chunksize, B2);
     if (rank == 0) {
 	printf("parallel-scan = %fs\n", MPI_Wtime() - tt);
-        long err = 0;
-        for (long i = 0; i < N; i++) {
-            err = std::max(err, std::abs(B0[i] - B2[i]));
-        //if (err != 0) {
-        //   std::cout << "B0[" << i << "] = " << B0[i] << std::endl;
-        //   std::cout << "B1[" << i << "] = " << B1[i] << std::endl;
-        //   std::cout << "B0[" << i <<"] - B1[" << i << "] = " << B0[i] - B1[i] << std::endl;
-        //   std::cout << "i = " << i << ", err = " << err << "\n";
-        //   break;
-        // }
-        // assert (err == 0);
-        }
+        for (int i = 0; i < N; i++) printf("B0[%d] = %ld, B2[%d] = %ld\n", i, B0[i], i, B2[i]);
+	long err = 0;
+        for (long i = 0; i < N; i++) err = std::max(err, std::abs(B0[i] - B2[i]));
         printf("error = %ld\n", err);
     }
     free(A);
