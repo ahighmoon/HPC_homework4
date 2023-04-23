@@ -2,7 +2,7 @@
 
 **Problem 1**
 
-I modified the given ***pingpong.cpp*** file a little bit to add a piece of code that gets and prints the current processor name. I run it with job.sbatch options: 
+I modified the given ***pingpong.cpp*** file a little bit to add a piece of code that gets and prints the current processor name. I run it with job.sbatch options:
 
 ```
 #!/bin/bash
@@ -29,7 +29,7 @@ pingpong latency: 2.508956e-03 ms
 pingpong bandwidth: 1.227394e+01 GB/s
 ```
 
-Then I also try to change it to 8 processes and add `--subscribe` flag to the compiler to allocate more slots in MPI. The result is: 
+Then I also try to change it to 8 processes and add `--subscribe` flag to the compiler to allocate more slots in MPI. The result is:
 
 ```
 Rank 0/8 running on cs339.hpc.nyu.edu.
@@ -80,16 +80,16 @@ Jacobi: Run time for different N and number of threads used (in seconds):
 | 800              | 0.834939 | 0.847266 | 1.138915 | 1.262281 | 1.276995 | 1.401142 |
 | 1600             | 3.803361 | 3.710784 | 4.250760 | 4.463524 | 4.562097 | 4.915007 |
 
-Gauss-Seidel: Run time for different N and number of threads used (in seconds):
+**Problem 4**
 
-| N\num of threads | 2         | 4        | 8         | 12        | 16        | 32        |
-| ---------------- | --------- | -------- | --------- | --------- | --------- | --------- |
-| 10               | 0.001277  | 0.001780 | 0.002494  | 0.518931  | 0.692328  | 1.411206  |
-| 20               | 0.001634  | 0.001956 | 0.002929  | 0.520263  | 0.693911  | 1.389902  |
-| 40               | 0.002722  | 0.002719 | 0.003464  | 0.518570  | 0.692076  | 1.412739  |
-| 80               | 0.008562  | 0.005182 | 0.004672  | 0.520848  | 0.701445  | 1.388122  |
-| 100              | 0.010318  | 0.007580 | 0.005765  | 0.523681  | 0.699641  | 1.391739  |
-| 200              | 0.037402  | 0.029513 | 0.034397  | 0.552567  | 0.709858  | 1.401142  |
-| 400              | 0.161485  | 0.121739 | 0.112694  | 0.662344  | 0.818592  | 1.498015  |
-| 800              | 1.863605  | 2.112722 | 2.377001  | 2.763952  | 2.773475  | 3.123177  |
-| 1600             | 11.017991 | 9.613312 | 11.348801 | 11.582299 | 13.246994 | 11.666601 |
+For the final project, we will be working in a group of three people: Jimmy Zhu, Huilin Li, and Kitty Li. We are planning to use the Lattice Boltzmann Method(LBM) to model a 2D flow in a rectangular channel, which is a method that instead of solving the Navier-Stokes equations directly, it models fluid particles moving from one discrete grid point to another according to collision rules. The numerical steps for simulating fluid are the collision step and the streaming step:\
+
+The collision step:
+\begin{equation}
+f_i(\vec{x}, t + \delta_t) = f_i(\vec{x}, t) + \frac{f_i^{eq} (\vec{x}, t) - f_i (\vec{x}, t)}{\tau_f}
+\end{equation}
+The streaming step:
+\begin{equation}
+f_i(\vec{x} + \vec{e}_i, t + \delta_t) = f_i(\vec{x}, t)
+\end{equation}
+We will be modeling the flow with two types of boundary conditions: physical boundary conditions and parallel boundary conditions. The physical boundary conditions require a no-slip condition at the upper and lower boundaries of the flow, while the left and right boundaries are periodic. The parallel boundary conditions involve partitioning the domain into subdomains, with either OpenMP or MPI used to communicate boundary condition information during the collision step.

@@ -17,14 +17,13 @@ void scan_seq(long* prefix_sum, const long* A, long n) {
 }
 
 void scan_mpi(long* prefix_sum, const long* A, long n) {
-    
+    // prefix_sum = B1, A = recv, n = chunksize
+
     prefix_sum[0] = A[0]; // I change this code to include the 1st entry of A
     for (int j = 1; j < n; j++){
         prefix_sum[j] = prefix_sum[j - 1] + A[j]; // change here from A[j-1] to A[j] to include current position in A
     }
-    
-    // compute the offset array serially
-    long* correction = (long*) malloc((p-1) * sizeof(long));
+        
     correction[0] = 0;
     for (int i = 1; i < p; i++) {
         correction[i] = correction[i-1] + prefix_sum[i * chunksize - 1];
@@ -55,6 +54,7 @@ int main(int argc, char* argv[]) {
     long* A = (long*) malloc(N * sizeof(long));
     long* B1 = (long*) malloc(chunksize * sizeof(long));
     long* recv = (long*) malloc(chunksize * sizeof(long));
+    long* correction = (long*) malloc(p * sizeof(long));
     for (long i = 0; i < chunksize; i++) B1[i] = 0;
     for (long i = 0; i < chunksize; i++) recv[i] = 0;
 
@@ -72,9 +72,7 @@ int main(int argc, char* argv[]) {
     }
     printf("rank = %d, B1[1] = %ld\n", rank, B1[1]);
     MPI_Scatter(A, chunksize, MPI_LONG, recv, chunksize, MPI_LONG, 0, comm);
-    //if (rank != 0){
-        //printf("rank = %d, B1[1] = %ld\n", rank, B1[1]);
-    //}
+    printf("rank = %d, B1[1] = %ld\n", rank, B1[1]);
 
     scan_mpi(B1, recv, chunksize);
     //printf("parallel-scan   = %fs\n", MPI_Wtime() - tt);
