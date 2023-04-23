@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH --job-name=HPC_pingpong
+#SBATCH --job-name=HPC_scan
 #SBATCH --nodes=4
 #SBATCH --cpus-per-task=1
 #SBATCH --tasks-per-node=1
@@ -11,4 +11,5 @@
 module purge 
 module load  amber/openmpi/intel/20.06 
 
-mpiexec ./pingpong 0 1
+### mpiexec -n 8 --oversubscribe ./pingpong 0 1
+mpiexec -n 4 ./mpi-scan
