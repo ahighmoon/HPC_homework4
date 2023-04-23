@@ -26,7 +26,6 @@ void scan_omp(long* prefix_sum, const long* A, long n) {
     // in parallel
     
     // size of each chunk should be a long int, rounded up
-    long chunksize = ceil(n / double(p));
 
     #pragma omp parallel for num_threads(p)
     for (int i = 0; i < p; i++){
@@ -58,14 +57,17 @@ void scan_omp(long* prefix_sum, const long* A, long n) {
 int main(int argc, char* argv[]) {
     MPI_Init(&argc, &argv);
     long N = 100000000;
+    long p = 8;
     int rank, size;
     MPI_Comm comm = MPI_COMM_WORLD;
     MPI_Comm_rank(comm, &rank);
     MPI_Comm_size(comm, &size);
+    long chunksize = ceil(N / double(p));
+    
+    long* A = (long*) malloc(N * sizeof(long));
+    long* B1 = (long*) malloc(chunksize * sizeof(long));
 
-    long* B1 = (long*) malloc(N * sizeof(long));
     if (rank == 0){
-        long* A = (long*) malloc(N * sizeof(long));
         long* B0 = (long*) malloc(N * sizeof(long));
         for (long i = 0; i < N; i++) A[i] = rand();
         for (long i = 0; i < N; i++) B0[i] = 0;
@@ -74,15 +76,18 @@ int main(int argc, char* argv[]) {
         double tt = MPI_Wtime(); ;
         scan_seq(B0, A, N);
         printf("sequential-scan = %fs\n", MPI_Wtime();  - tt);
+        free(B0);
     }
 
     tt = MPI_Wtime();
-    scan_omp(B1, A, N);
-    printf("parallel-scan   = %fs\n", MPI_Wtime() - tt);
+    MPI_Scatter(A, chunksize, MPI_LONG, B1, chunksize, MPI_LONG, 0, comm);
+    //scan_omp(B1, A, N);
+    //printf("parallel-scan   = %fs\n", MPI_Wtime() - tt);
 
-    long err = 0;
-    for (long i = 0; i < N; i++) {
-        err = std::max(err, std::abs(B0[i] - B1[i]));
+    //long err = 0;
+    //for (long i = 0; i < N; i++) {
+        //err = std::max(err, std::abs(B0[i] - B1[i]));
+
         // if (err != 0) {
         //   std::cout << "B0[" << i << "] = " << B0[i] << std::endl;
         //   std::cout << "B1[" << i << "] = " << B1[i] << std::endl;
@@ -91,11 +96,13 @@ int main(int argc, char* argv[]) {
         //   break;
         // }
         // assert (err == 0);
-    }
-    printf("error = %ld\n", err);
+    //}
+    //printf("error = %ld\n", err);
 
     free(A);
-    free(B0);
     free(B1);
+    MPI_Finalize();
     return 0;
+
+
 }
