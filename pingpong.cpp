@@ -22,7 +22,6 @@ double time_pingpong(int proc0, int proc1, long Nrepeat, long Nsize, MPI_Comm co
         MPI_Recv(msg, Nsize, MPI_CHAR, proc0, repeat, comm, &status);
     }
     else { // odd iterations
-
       if (rank == proc0)
         MPI_Recv(msg, Nsize, MPI_CHAR, proc1, repeat, comm, &status);
       else if (rank == proc1)
@@ -45,13 +44,11 @@ int main(int argc, char** argv) {
   int proc0 = atoi(argv[1]);
   int proc1 = atoi(argv[2]);
 
-
-
   int rank, size;
   MPI_Comm comm = MPI_COMM_WORLD;
   MPI_Comm_rank(comm, &rank);
   MPI_Comm_size(comm, &size);
-  printf("my rank is %d\n", rank);
+  //printf("my rank is %d\n", rank);
 
   char processor_name[MPI_MAX_PROCESSOR_NAME];
   int name_len;
