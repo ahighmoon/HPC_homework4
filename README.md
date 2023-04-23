@@ -82,14 +82,18 @@ Jacobi: Run time for different N and number of threads used (in seconds):
 
 **Problem 4**
 
-For the final project, we will be working in a group of three people: Jimmy Zhu, Huilin Li, and Kitty Li. We are planning to use the Lattice Boltzmann Method(LBM) to model a 2D flow in a rectangular channel, which is a method that instead of solving the Navier-Stokes equations directly, it models fluid particles moving from one discrete grid point to another according to collision rules. The numerical steps for simulating fluid are the collision step and the streaming step:\
+For the final project, we will be working in a group of three people: Jimmy Zhu, Huilin Li, and Kitty Li. We are planning to use the Lattice Boltzmann Method(LBM) to model a 2D flow in a rectangular channel, which is a method that instead of solving the Navier-Stokes equations directly, it models fluid particles moving from one discrete grid point to another according to collision rules. The numerical steps for simulating fluid are the collision step and the streaming step:
 
 The collision step:
-\begin{equation}
+
+$$
 f_i(\vec{x}, t + \delta_t) = f_i(\vec{x}, t) + \frac{f_i^{eq} (\vec{x}, t) - f_i (\vec{x}, t)}{\tau_f}
-\end{equation}
+$$
+
 The streaming step:
-\begin{equation}
+
+$$
 f_i(\vec{x} + \vec{e}_i, t + \delta_t) = f_i(\vec{x}, t)
-\end{equation}
+$$
+
 We will be modeling the flow with two types of boundary conditions: physical boundary conditions and parallel boundary conditions. The physical boundary conditions require a no-slip condition at the upper and lower boundaries of the flow, while the left and right boundaries are periodic. The parallel boundary conditions involve partitioning the domain into subdomains, with either OpenMP or MPI used to communicate boundary condition information during the collision step.
