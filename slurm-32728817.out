@@ -1,0 +1,21 @@
+sequential-scan = 0.000000s
+rank = 0, B1[1] = 0
+rank = 1, B1[1] = 0
+rank = 2, B1[1] = 0
+rank = 3, B1[1] = 0
+rank = 1, B1[1] = 0
+rank = 1, data = 0 5 0 0
+rank = 2, B1[1] = 0
+rank = 2, data = 0 0 9 0
+rank = 0, B1[1] = 0
+rank = 0, data = 1 0 0 0
+rank = 3, B1[1] = 0
+rank = 3, data = 0 0 0 13
+rank = 0, data = 1 5 9 13
+rank = 0, prefix_sum = 0 1 24214832 24214640 1 10 24212448 22586215479892
+rank = 2, data = 1 5 9 13
+rank = 2, prefix_sum = 10 15 36874224 38555440 1 10 36911488 23124296657492
+rank = 3, data = 1 5 9 13
+rank = 3, prefix_sum = 21 28 13391904 15073072 1 10 13429120 23356339628628
+rank = 1, data = 1 5 9 13
+rank = 1, prefix_sum = 3 6 17303504 18984720 1 10 17340800 23349608225364
