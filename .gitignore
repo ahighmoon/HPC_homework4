@@ -3,3 +3,5 @@ a.out
 pingpong
 MPI_gather
 MPI_gather.cpp
+int_ring
+int_ring_large_array
