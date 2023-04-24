@@ -23,6 +23,12 @@ int main(int argc, char *argv[]) { //variable number, variable name
             value[i] = i;
         }
     }
+
+    char processor_name[MPI_MAX_PROCESSOR_NAME];
+    int name_len;
+    MPI_Get_processor_name(processor_name, &name_len);
+    printf("Rank %d/%d running on %s.\n", rank, size, processor_name);
+
     tt = MPI_Wtime(); //test starttime, Wtime counts real time
     for (int i = 0; i < N; i++) {
         if (rank == 0)  {
