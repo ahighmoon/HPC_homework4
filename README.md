@@ -70,12 +70,17 @@ Rank 1/4 running on cs516.hpc.nyu.edu.
 number of iterations: 1000
 Time elapsed: 0.726797 s
 Bandwidth: 2.88547 GBytes/s
-
 ```
 
 **Problem 3**
 
-I choose to do part(a). See ***mpi-scan.cpp*** for code doing the mpi-version scan function. The execute script is included in the `job.sbatch`. In this code I fixed the number of processes to run MPI to be 4. The result is 
+I choose to do part(a). See ***mpi-scan.cpp*** for code doing the mpi-version scan function. The execute script is included in the `job.sbatch`. In this code I fixed the number of processes to run MPI to be 4. The result is
+
+```
+sequential-scan = 0.014378s
+parallel-scan   = 0.093689s
+error = 0
+```
 
 **Problem 4**
 
