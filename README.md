@@ -46,23 +46,22 @@ pingpong bandwidth: 1.155863e+01 GB/s
 
 **Problem 2**
 
-I parallelized the serial code and ran it on AMD 64-bit CPU, Intel® Core™ i5-10210U CPU, with 4 compute cores. The OS is Windows Subsystem for Linux distro Ubuntu 22.04. The runtime with different thread number are following:
+I run the int_ring.c file with bash script `mpiexec -np 4 ./int_ring 1` and get a value of 6 after 1 iteration. Then changing the last parameter to 2 yields 12 and to 3 yields 18. So one iteration must produce a 6 and this is correct because the 4 processes have rank ranging 0, 1, 2, 3, adding up to 6. So the program should be correct. All processorshave properly added their contribution each time they received and sent the message.
 
-thread number = 2, run time = 0.167012s
-thread number = 3, run time = 0.170121s
-thread number = 4, run time = 0.236609s
-thread number = 5, run time = 0.201763s
-thread number = 6, run time = 0.225366s
-thread number = 7, run time = 0.223382s
-thread number = 8, run time = 0.222939s
-thread number = 9, run time = 0.270187s
-thread number = 10, run time = 0.242522s
-thread number = 11, run time = 0.232214s
-thread number = 12, run time = 0.246561s
-thread number = 13, run time = 0.259333s
-thread number = 14, run time = 0.225655s
-thread number = 15, run time = 0.232036s
-thread number = 16, run time = 0.228077s
+For a larger N to test latency I set N to be 1000 as in pingpong.cpp. The sbatch file is `p2.sbatch`. The result is
+
+```
+Rank 0/4 running on cs515.hpc.nyu.edu.
+Rank 1/4 running on cs516.hpc.nyu.edu.
+Rank 3/4 running on cs518.hpc.nyu.edu.
+Rank 2/4 running on cs517.hpc.nyu.edu.
+Result after 1000 iterations: 6000
+Time elapsed: 0.071505s
+
+```
+
+Finally I modified the program into `int_ring_large_array_cpp` to send a large array of 2MB. The sbatch file is `p2_4.sbatch`. The result is
+
 
 **Problem 3**
 
