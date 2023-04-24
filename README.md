@@ -62,22 +62,20 @@ Time elapsed: 0.071505s
 
 Finally I modified the program into `int_ring_large_array_cpp` to send a large array of 2MB. The sbatch file is `p2_4.sbatch`. The result is
 
+```
+Rank 0/4 running on cs515.hpc.nyu.edu.
+Rank 2/4 running on cs517.hpc.nyu.edu.
+Rank 3/4 running on cs518.hpc.nyu.edu.
+Rank 1/4 running on cs516.hpc.nyu.edu.
+number of iterations: 1000
+Time elapsed: 0.726797 s
+Bandwidth: 2.88547 GBytes/s
+
+```
 
 **Problem 3**
 
-Jacobi: Run time for different N and number of threads used (in seconds):
-
-| N\num of threads | 2        | 4        | 8        | 12       | 16       | 32       |
-| ---------------- | -------- | -------- | -------- | -------- | -------- | -------- |
-| 10               | 0.000911 | 0.001169 | 0.001628 | 0.259923 | 0.345807 | 0.704130 |
-| 20               | 0.001295 | 0.001224 | 0.001860 | 0.262076 | 0.348330 | 0.688536 |
-| 40               | 0.001781 | 0.001846 | 0.002243 | 0.262964 | 0.368311 | 0.694200 |
-| 80               | 0.003787 | 0.003333 | 0.003277 | 0.262515 | 0.347103 | 0.689056 |
-| 100              | 0.005197 | 0.004778 | 0.004211 | 0.262674 | 0.349931 | 0.688023 |
-| 200              | 0.015535 | 0.014766 | 0.009952 | 0.267112 | 0.354343 | 0.696541 |
-| 400              | 0.082922 | 0.069810 | 0.065902 | 0.314272 | 0.418587 | 0.722531 |
-| 800              | 0.834939 | 0.847266 | 1.138915 | 1.262281 | 1.276995 | 1.401142 |
-| 1600             | 3.803361 | 3.710784 | 4.250760 | 4.463524 | 4.562097 | 4.915007 |
+I choose to do part(a). See ***mpi-scan.cpp*** for code doing the mpi-version scan function. The execute script is included in the `job.sbatch`. In this code I fixed the number of processes to run MPI to be 4. The result is 
 
 **Problem 4**
 

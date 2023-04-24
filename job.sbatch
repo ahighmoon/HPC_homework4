@@ -11,8 +11,9 @@
 module purge 
 module load  amber/openmpi/intel/20.06 
 
-echo "Problem 1: pingpong"
+echo Problem 1: pingpong\n
 mpiexec -n 4 ./pingpong 0 1
 ### mpiexec -n 8 --oversubscribe ./pingpong 0 1
-echo "Problem 3: scan function in mpi"
+echo \n
+echo Problem 3: scan function in mpi\n
 mpiexec -n 4 ./mpi-scan
