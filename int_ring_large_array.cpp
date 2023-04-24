@@ -43,9 +43,8 @@ int main(int argc, char *argv[]) { //variable number, variable name
     if (rank == 0) {
         double bandwidth = N*ARRAY_SIZE*sizeof(int)/tt/1e9; // in GB/s
         std::cout << "number of iterations: "  << N << std::endl;
-        std::cout << "Time elapsed: " << tt << " seconds" << std::endl;
-        std::cout << "Bandwidth: " << bandwidth << " GBytes/s" << std::endl;
-        std::cout << "number of processes: " << size << std::endl;
+        std::cout << "Time elapsed: " << tt << " s" << std::endl;
+        std::cout << "Bandwidth: " << bandwidth << " GBytes/s" << std::endl; 
     }
     MPI_Finalize();
     return 0;

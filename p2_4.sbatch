@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH --job-name=inner-prod
+#SBATCH --job-name=p2_4
 #SBATCH --nodes=4 
 #SBATCH --cpus-per-task=1
 #SBATCH --tasks-per-node=1
@@ -12,6 +12,3 @@ module purge
 module load  amber/openmpi/intel/20.06 
 
 mpirun -np 4 ./int_ring_large_array 1000
-
-
-
