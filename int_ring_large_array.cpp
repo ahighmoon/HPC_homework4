@@ -23,6 +23,12 @@ int main(int argc, char *argv[]) { //variable number, variable name
             value[i] = i;
         }
     }
+
+    char processor_name[MPI_MAX_PROCESSOR_NAME];
+    int name_len;
+    MPI_Get_processor_name(processor_name, &name_len);
+    printf("Rank %d/%d running on %s.\n", rank, size, processor_name);
+
     tt = MPI_Wtime(); //test starttime, Wtime counts real time
     for (int i = 0; i < N; i++) {
         if (rank == 0)  {
@@ -37,9 +43,8 @@ int main(int argc, char *argv[]) { //variable number, variable name
     if (rank == 0) {
         double bandwidth = N*ARRAY_SIZE*sizeof(int)/tt/1e9; // in GB/s
         std::cout << "number of iterations: "  << N << std::endl;
-        std::cout << "Time elapsed: " << tt << " seconds" << std::endl;
-        std::cout << "Bandwidth: " << bandwidth << " GBytes/s" << std::endl;
-        std::cout << "number of processes: " << size << std::endl;
+        std::cout << "Time elapsed: " << tt << " s" << std::endl;
+        std::cout << "Bandwidth: " << bandwidth << " GBytes/s" << std::endl; 
     }
     MPI_Finalize();
     return 0;
